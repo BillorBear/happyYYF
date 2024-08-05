@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown to 17:30</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+        #dog {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        #message {
+            font-size: 5em;
+            font-weight: bold;
+            color: blue;
+            margin-bottom: 20px;
+            font-family: 'Luckiest Guy', cursive;
+        }
+        #countdown {
+            font-size: 5em;
+            color: #ff6347; /* Tomato color */
+            font-family: 'Luckiest Guy', cursive;
+            text-shadow: 2px 2px #ffd700; /* Gold color shadow */
+        }
+        #clock {
+            font-size: 2em;
+            color: #333;
+            margin-top: 20px;
+        }
+        .button {
+            position: absolute;
+            bottom: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #shutdownButton {
+            right: 170px;
+        }
+        #resumeButton {
+            right: 18px;
+            background-color: green;
+        }
+        .button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <img id="dog" src="/Users/liuchunlin/Downloads/aboutSelf/giphy.webp" alt="Running Dog">
+    <div id="message">小冯下班倒计时！</div>
+    <div id="countdown"></div>
+    <div id="clock"></div>
+    <button id="shutdownButton" class="button">关机跑路！</button>
+
+    <button id="resumeButton" class="button">恢复倒计时！</button>
+
+    <script>
+        let countdownInterval;
+        let clockInterval;
+        let endTime;
+
+        function startCountdown(startTime, endTime, display) {
+            function updateCountdown() {
+                var now = new Date().getTime();
+
+                if (now < startTime || now > endTime) {
+                    display.textContent = "下班下班！";
+                    clearInterval(countdownInterval);
+                    return;
+                }
+
+                var distance = endTime - now;
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = hours + ":" + minutes + ":" + seconds;
+            }
+
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        function updateClock() {
+            var now = new Date();
+            var hours = now.getUTCHours() + 8;  // Convert UTC to Beijing Time (UTC+8)
+            var minutes = now.getUTCMinutes();
+            var seconds = now.getUTCSeconds();
+
+            if (hours >= 24) hours -= 24;
+
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            var timeString = hours + ":" + minutes + ":" + seconds;
+            document.getElementById('clock').textContent = "当前北京时间：" + timeString;
+        }
+
+        function stopCountdown() {
+            clearInterval(countdownInterval);
+            document.getElementById('countdown').textContent = "下班下班！";
+        }
+
+        function resumeCountdown() {
+            var now = new Date().getTime();
+            startCountdown(now, endTime, document.getElementById('countdown'));
+        }
+
+        window.onload = function () {
+            var now = new Date();
+            var startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 30, 0).getTime();
+            endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 30, 0).getTime();
+            
+            if (now.getTime() > endTime) {
+                startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 8, 30, 0).getTime();
+                endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 17, 30, 0).getTime();
+            }
+
+            var display = document.querySelector('#countdown');
+            startCountdown(startTime, endTime, display);
+            updateClock();
+            clockInterval = setInterval(updateClock, 1000);
+
+            document.getElementById('shutdownButton').addEventListener('click', stopCountdown);
+            document.getElementById('resumeButton').addEventListener('click', resumeCountdown);
+        };
+    </script>
+</body>
+</html>
