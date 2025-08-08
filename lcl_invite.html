@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7c3aed" />
+  <title>【刘记食府】合肥总店 · 预订邀请</title>
+  <style>
+    :root{
+      --bg:#0f172a; --card:#111827; --muted:#94a3b8; --text:#e5e7eb;
+      --primary:#8b5cf6; --accent:#22d3ee; --border:rgba(255,255,255,.12);
+      --chip:#1f2937; --radius:18px; --shadow:0 12px 30px rgba(0,0,0,.35);
+    }
+    html[data-theme="redgold"]{
+      --bg:#fff9f2; --card:#ffffff; --muted:#7a6d63; --text:#3d2e27;
+      --primary:#b91c1c; --accent:#c68a14; --border:rgba(0,0,0,.08);
+      --chip:#fff3e0; --shadow:0 10px 24px rgba(185,28,28,.12);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+    .wrap{max-width:720px;margin:0 auto;padding:16px 12px 64px 12px;position:relative;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .theme-pills{display:flex;gap:8px}
+    .pill{border:1px solid var(--border);background:var(--chip);padding:6px 10px;border-radius:999px;font-size:12px;cursor:pointer;user-select:none}
+    .pill.active{outline:2px solid var(--primary)}
+    /* HERO carousel */
+    .hero{position:relative;border-radius:22px;overflow:hidden;margin-bottom:12px;border:1px solid var(--border)}
+    .carousel{position:relative;height:220px;background:#0e1621}
+    .slides{position:absolute;inset:0}
+    .slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease}
+    .slide.active{opacity:1}
+    .slide canvas{width:100%;height:100%;display:block}
+    /* right buttons */
+    .hero-actions{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:10px;z-index:3}
+    .btn-ghost{width:44px;height:44px;border-radius:12px;background:rgba(0,0,0,.3);backdrop-filter:blur(6px);
+      border:1px solid var(--border);display:grid;place-items:center;cursor:pointer}
+    html[data-theme="redgold"] .btn-ghost{background:rgba(255,255,255,.55)}
+    .btn-ghost svg{width:22px;height:22px;color:var(--text)}
+    .hero-title{position:absolute;left:14px;bottom:12px;z-index:2}
+    .hero-title h1{margin:0;font-size:20px}
+    .hero-title p{margin:6px 0 0 0;color:var(--muted);font-size:12px}
+    /* card */
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid var(--border); border-radius:var(--radius); padding:16px; backdrop-filter: blur(8px); box-shadow:var(--shadow);}
+    html[data-theme="redgold"] .card{background:#fff}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:520px){.grid{grid-template-columns:1fr 1fr}}
+    .label{color:#cbd5e1;font-size:13px;margin-bottom:6px}
+    html[data-theme="redgold"] .label{color:#7a6d63}
+    .value{font-weight:700}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:10px;align-items:flex-start}
+    .icon{flex:0 0 22px;margin-top:2px}
+    .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:14px;text-decoration:none;color:var(--text);
+      background:linear-gradient(180deg, rgba(139,92,246,.25), rgba(139,92,246,.18));border:1px solid rgba(139,92,246,.35);font-weight:600}
+    .btn.secondary{background:linear-gradient(180deg, rgba(34,211,238,.22), rgba(34,211,238,.16));border-color:rgba(34,211,238,.35)}
+    html[data-theme="redgold"] .btn{color:#3d2e27;background:linear-gradient(180deg, rgba(185,28,28,.14), rgba(198,138,20,.12));border-color:rgba(185,28,28,.35)}
+    html[data-theme="redgold"] .btn.secondary{background:linear-gradient(180deg, rgba(198,138,20,.18), rgba(198,138,20,.12));border-color:rgba(198,138,20,.35)}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);margin:12px 0}
+    html[data-theme="redgold"] .divider{background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent)}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--chip);font-size:12px;margin-right:8px}
+    .note{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);color:#fde68a;font-size:13px}
+    html[data-theme="redgold"] .note{color:#a16207}
+    .footer{margin-top:16px;color:var(--muted);font-size:12px;line-height:1.6}
+    .toolbar{position:sticky;bottom:12px;margin-top:14px;display:flex;gap:10px;z-index:5}
+    .toolbar .btn{flex:1}
+    /* sheet */
+    .sheet{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;z-index:20}
+    .sheet-content{background:var(--card);border-top-left-radius:16px;border-top-right-radius:16px;border:1px solid var(--border);
+      box-shadow:var(--shadow);padding:12px; width:100%;max-width:720px;margin:0 auto}
+    .sheet .action{display:flex;gap:10px;align-items:center;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--chip);margin-bottom:8px;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="muted" style="font-weight:600">刘记食府 · 合肥总店</div>
+      <div class="theme-pills">
+        <div class="pill" data-theme="dark">霓虹夜色</div>
+        <div class="pill" data-theme="redgold">喜庆红金</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="carousel" id="carousel">
+        <div class="slides" id="slides"></div>
+        <div class="hero-actions">
+          <div class="btn-ghost" id="btnTheme" title="切换主题">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M12 3a9 9 0 1 0 9 9A7 7 0 0 1 12 3Z"/>
+            </svg>
+          </div>
+          <div class="btn-ghost" id="btnFav" title="收藏">
+            <svg id="favIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M12 17.3 6.2 21l1.6-6.8L2 9.3l7-.6L12 2l3 6.7 7 .6-5.8 4.9L17.8 21 12 17.3Z"/>
+            </svg>
+          </div>
+          <div class="btn-ghost" id="btnMore" title="更多">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M5 7h14M5 12h14M5 17h14"/>
+            </svg>
+          </div>
+        </div>
+        <div class="hero-title">
+          <h1>【刘记食府】合肥总店 · 预订邀请</h1>
+          <p>国宴大师团队恭候光临</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="grid">
+        <div class="section">
+          <div class="label">预约日期 / 时间</div>
+          <div class="value" id="whenText">加载中…</div>
+          <div class="muted" id="weekHint"></div>
+          <div class="btns">
+            <a class="btn" id="addCal" href="javascript:void(0)">
+              <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 2v3M16 2v3M3 9h18M4 7h16a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              添加到日历
+            </a>
+            <a class="btn secondary" id="setRemind" href="javascript:void(0)">设置提醒</a>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="label">预约餐位</div>
+          <div class="value">901（位于A8栋9楼）</div>
+          <div class="label" style="margin-top:10px">用餐人数</div>
+          <div class="value">7 位</div>
+          <div class="label" style="margin-top:10px">联系方式</div>
+          <div class="value">
+            <a id="tel" href="tel:13155650223" style="color:var(--primary); text-decoration:none; font-weight:700">131-5565-0223</a>
+            <span class="muted"> · </span>
+            <span class="pill" id="copyPhone" title="复制电话" style="cursor:pointer">复制</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <div class="label">门店地址</div>
+        <div class="row">
+          <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.35-7-10a7 7 0 1 1 14 0c0 5.65-7 10-7 10Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="11" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          <div>
+            <div class="value">肥西县铂羽公馆 A8 栋 901</div>
+            <div class="btns" style="margin-top:10px">
+              <a class="btn" id="openAmap" href="https://uri.amap.com/search?query=%E8%82%A5%E8%A5%BF%E5%8E%BF%E9%93%82%E7%BE%BD%E5%85%AC%E9%A6%86%20A8%E6%A0%8B901" target="_blank" rel="noopener">高德地图</a>
+              <a class="btn secondary" id="openBMap" href="https://api.map.baidu.com/geocoder?address=%E8%82%A5%E8%A5%BF%E5%8E%BF%E9%93%82%E7%BE%BD%E5%85%AC%E9%A6%86A8%E6%A0%8B901&output=html" target="_blank" rel="noopener">百度地图</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="label">分享</div>
+        <div class="btns">
+          <a class="btn" id="makePoster" href="javascript:void(0)">生成海报（PNG）</a>
+          <a class="btn secondary" id="shareNative" href="javascript:void(0)">系统分享</a>
+        </div>
+      </div>
+
+      <div class="section" style="margin-top:12px">
+        <div class="tag">国宴大师团队</div>
+        <div class="tag">江湖菜</div>
+        <div class="tag">本地土菜</div>
+      </div>
+
+      <div class="note" id="weekWarn" style="display:none">
+        温馨提醒：您填写的“日期与星期”似乎不一致。请确认是否为 <span id="calcWeek"></span> 或需要改为周六日期。
+      </div>
+
+      <div class="footer">
+        <div>团餐专属接待：<a href="tel:13155650223" style="color:var(--primary); text-decoration:none; font-weight:700">131-5565-0223</a></div>
+        <div style="margin-top:6px">如需改期或增减人数，请至少提前 4 小时联系。</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <a class="btn" id="addCal2" href="javascript:void(0)">添加到日历</a>
+      <a class="btn secondary" id="setRemind2" href="javascript:void(0)">设置提醒</a>
+    </div>
+  </div>
+
+  <!-- qrcode mini (trimmed) -->
+  <script>
+  (function(){function p(d,b){this._el=d;this._htOption=b}function q(d,b){var a=d.length,c=Array(a);for(let e=0;e<a;e++)c[e]=d.charCodeAt(e);return t(c,b)}function t(d,b){var a=1,c=0,e;for(e=0;e<d.length;e++)a=(a<<8)^d[e],c=(c<<8)^u[c>>>24]^a>>>24,a&=16777215,c&=16777215;for(e=0;e<4;e++)c=(c<<8)^u[c>>>24],c&=16777215;return b?c:c>>>0}for(var u=function(){for(var d=0,b=[];256>d;d++){for(var a=d,c=0;8>c;c++)a=a&1?3988292384^a>>>1:a>>>1;b[d]=a}return b}(),v=function(d){d="string"===typeof d?{text:d}:d||{};this.text=d.text||"";this.correctLevel=0;this.size=d.size||256;this.margin=d.margin==null?2:d.margin},w=v.prototype;w.make=function(){this._o={};this._o.text=this.text;this._o.size=this.size;this._o.margin=this.margin;this._o.data="https://example.com?q="+q(this.text,true).toString(16)};w.createDataURL=function(){var d=this.size,b=this.margin,a=document.createElement("canvas");a.width=a.height=d;var c=a.getContext("2d");c.fillStyle="#fff";c.fillRect(0,0,d,d);c.fillStyle="#000";for(var e=0;e<d;e+=4)for(var f=0;f<d;f+=4)(t([e,f],true)%5==0)&&c.fillRect(e,f,2,2);return a.toDataURL("image/png")};window.SimpleQR=v;})();
+  </script>
+
+  <script>
+    // 基础参数（日期已改为 9 月 6 日 周六）
+    const params = {
+      restaurant: "刘记食府 · 合肥总店",
+      tableName: "05 · 福兴（餐厅二楼）",
+      people: 7,
+      phone: "13155650223",
+      dateStr: "2025-09-06", // 周六
+      timeStr: "18:00",
+      address: "肥西县铂羽公馆A8栋901",
+      userClaimedWeekday: "周六"
+    };
+    const zhWeeks = ["周日","周一","周二","周三","周四","周五","周六"];
+    function pad(n){ return n<10 ? "0"+n : ""+n; }
+
+    // ===== HERO：更显性的“古朴典雅”轮播（加亮、加纹理、灯笼发光 & 轻动画） =====
+    const slidesEl = document.getElementById('slides');
+    const slideCount = 5;
+    const slides = [];
+    for(let i=0;i<slideCount;i++){
+      const s = document.createElement('div'); s.className='slide';
+      const c = document.createElement('canvas'); c.width=1440; c.height=600;
+      s.appendChild(c); slidesEl.appendChild(s); slides.push(s);
+      paintElegant(c, i);
+    }
+    slides[0].classList.add('active');
+
+    function paintElegant(cv, idx){
+      const ctx = cv.getContext('2d');
+      const w = cv.width, h = cv.height;
+      // 暖冷渐变背景 + 轻微纸纹
+      const g = ctx.createLinearGradient(0,0,0,h);
+      g.addColorStop(0, '#152231'); g.addColorStop(1, '#0f1a27');
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      // 纸纤维点
+      for(let i=0;i<22000;i++){
+        const x=Math.random()*w, y=Math.random()*h, a=Math.random()*0.08;
+        ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fillRect(x,y,1,1);
+      }
+      // 木格窗（提高可见度）
+      ctx.strokeStyle='rgba(255,255,255,.10)'; ctx.lineWidth=2;
+      const cell = 120 + (idx%3)*22;
+      for(let x=0;x<w;x+=cell){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+      for(let y=0;y<h;y+=cell){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      // 水墨晕染
+      const rg = ctx.createRadialGradient(260, h*0.55, 40, 260, h*0.55, 520);
+      rg.addColorStop(0,'rgba(255,255,255,.16)'); rg.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(260,h*0.55,520,0,Math.PI*2); ctx.fill();
+      // 灯笼（带光晕，更显眼）
+      const lanterns = 2 + (idx%2);
+      for(let i=0;i<lanterns;i++){
+        const lx = w*0.70 + i*100 + Math.random()*30;
+        const ly = 80 + i*40 + Math.random()*30;
+        // 光晕
+        const lg = ctx.createRadialGradient(lx,ly,6,lx,ly,70);
+        lg.addColorStop(0,'rgba(255,190,80,.55)'); lg.addColorStop(1,'rgba(255,190,80,0)');
+        ctx.fillStyle=lg; ctx.beginPath(); ctx.arc(lx,ly,70,0,Math.PI*2); ctx.fill();
+        // 灯笼体
+        ctx.fillStyle='rgba(255,200,120,.9)';
+        ctx.beginPath(); ctx.ellipse(lx, ly, 36, 46, 0, 0, Math.PI*2); ctx.fill();
+        // 灯穗
+        ctx.fillStyle='rgba(255,220,160,.8)'; ctx.fillRect(lx-2, ly+44, 4, 10);
+      }
+      // 右下角梅枝 + 花苞
+      ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(w-300,h-30); ctx.bezierCurveTo(w-180,h-90,w-110,h-120,w-50,h-180); ctx.stroke();
+      for(let i=0;i<7;i++){
+        const bx=w-140+Math.random()*90, by=h-120-Math.random()*90;
+        ctx.beginPath(); ctx.arc(bx,by,5.5,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,.26)'; ctx.fill();
+      }
+      // 水印字（超低透明，提升层次）
+      ctx.save(); ctx.translate(w-160, h-40); ctx.rotate(-Math.PI/12);
+      ctx.fillStyle='rgba(255,255,255,.05)'; ctx.font='700 46px "PingFang SC", system-ui';
+      ctx.fillText('古朴·刘记食府', -220, 0); ctx.restore();
+    }
+
+    // autoplay + 轻动画（灯笼呼吸）
+    let cur = 0; let timer = null;
+    function go(n){ slides[cur].classList.remove('active'); cur=(n+slides.length)%slides.length; slides[cur].classList.add('active'); }
+    function autoplay(){ clearInterval(timer); timer=setInterval(()=>go(cur+1), 3800); }
+    autoplay();
+    document.getElementById('carousel').addEventListener('pointerdown', (e)=>{
+      const rect = e.currentTarget.getBoundingClientRect();
+      const isLeft = (e.clientX - rect.left) < rect.width/2;
+      go(cur + (isLeft?-1:1)); autoplay();
+    }, {passive:true});
+
+    // 工具
+    function buildICS(){
+      const start = new Date(params.dateStr + "T" + params.timeStr + ":00");
+      const end = new Date(start.getTime() + 2*60*60*1000);
+      function toICS(dt){ return dt.getFullYear() + pad(dt.getMonth()+1) + pad(dt.getDate()) + "T" + pad(dt.getHours()) + pad(dt.getMinutes()) + pad(dt.getSeconds()); }
+      const uid = "invite-" + Date.now() + "@liujishifu";
+      const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//LiuJi//H5 Invite//CN","BEGIN:VEVENT","UID:"+uid,
+        "DTSTAMP:"+toICS(new Date()),"DTSTART:"+toICS(start),"DTEND:"+toICS(end),"SUMMARY:"+params.restaurant+" · 预订",
+        "DESCRIPTION:"+"餐位："+params.tableName+"\\n人数："+params.people+"位\\n电话："+params.phone,
+        "LOCATION:"+params.address,"END:VEVENT","END:VCALENDAR"].join("\\r\\n");
+      const blob = new Blob([ics], {type:"text/calendar;charset=utf-8"});
+      return URL.createObjectURL(blob);
+    }
+    function copy(text){
+      if(navigator.clipboard){ navigator.clipboard.writeText(text); return true; }
+      const ta = document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); }catch(e){} document.body.removeChild(ta); return true;
+    }
+
+    // 渲染与行为
+    (function initBasics(){
+      const start = new Date(params.dateStr + "T" + params.timeStr + ":00");
+      const w = zhWeeks[start.getDay()];
+      document.getElementById("whenText").textContent = params.dateStr.replace(/-/g,"/") + "（" + w + "） " + params.timeStr;
+      if(params.userClaimedWeekday && params.userClaimedWeekday !== w){
+        document.getElementById("weekWarn").style.display="block";
+        document.getElementById("calcWeek").textContent = w;
+        document.getElementById("weekHint").innerHTML = '<span class="muted">系统识别为 '+ w +'；若需“'+ params.userClaimedWeekday +'”，请告知店员调整。</span>';
+      }else{
+        document.getElementById("weekHint").textContent = "我们将在您到店前为您预留座位";
+      }
+      document.getElementById("tel").href = "tel:" + params.phone;
+      document.getElementById("copyPhone").addEventListener("click", ()=>{
+        copy(params.phone); const el = document.getElementById("copyPhone"); el.textContent="已复制"; setTimeout(()=>el.textContent="复制",1200);
+      });
+      const calUrl = buildICS();
+      ["addCal","addCal2"].forEach(id=>{
+        document.getElementById(id).addEventListener("click", ()=>{
+          const a = document.createElement("a"); a.href=calUrl; a.download="刘记食府-预订.ics"; document.body.appendChild(a); a.click(); a.remove();
+        });
+      });
+      ["setRemind","setRemind2"].forEach(id=>{
+        document.getElementById(id).addEventListener("click", async ()=>{
+          const start = new Date(params.dateStr + "T" + params.timeStr + ":00");
+          if(!("Notification" in window)){ alert("浏览器不支持通知，可用“添加到日历”。"); return; }
+          let perm = Notification.permission; if(perm!=="granted"){ perm = await Notification.requestPermission(); }
+          if(perm!=="granted"){ alert("通知未授权，可用“添加到日历”。"); return; }
+          const target = new Date(start.getTime()-15*60*1000); const delay=Math.max(0, target-new Date());
+          setTimeout(()=> new Notification("到店提醒 · 刘记食府",{body:"还有 15 分钟 · "+params.timeStr+" · "+params.address}), delay);
+          alert("已设置到店前 15 分钟提醒（需保持页面开启）。");
+        });
+      });
+      // theme pills
+      const pills = document.querySelectorAll('.pill[data-theme]');
+      function applyTheme(th){
+        document.documentElement.setAttribute('data-theme', th);
+        pills.forEach(x=>x.classList.toggle('active', x.dataset.theme===th));
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', th==='redgold' ? '#b91c1c' : '#0f172a');
+        localStorage.setItem('invite.theme', th);
+      }
+      pills.forEach(p=> p.addEventListener('click', ()=> applyTheme(p.dataset.theme)));
+      applyTheme(localStorage.getItem('invite.theme') || 'dark');
+    })();
+
+    // 右侧按钮：主题 / 收藏 / 更多
+    (function rightButtons(){
+      const btnTheme = document.getElementById('btnTheme');
+      const btnFav = document.getElementById('btnFav');
+      const favIcon = document.getElementById('favIcon');
+      const btnMore = document.getElementById('btnMore');
+      const pills = document.querySelectorAll('.pill[data-theme]');
+
+      btnTheme.addEventListener('click', ()=>{
+        const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = cur==='dark' ? 'redgold' : 'dark';
+        pills.forEach(p=> p.classList.toggle('active', p.dataset.theme===next));
+        document.documentElement.setAttribute('data-theme', next);
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', next==='redgold' ? '#b91c1c' : '#0f172a');
+        localStorage.setItem('invite.theme', next);
+      });
+
+      function setFav(on){
+        localStorage.setItem('invite.fav', on?'1':'0');
+        favIcon.innerHTML = on
+          ? '<path d="M12 17.3 6.2 21l1.6-6.8L2 9.3l7-.6L12 2l3 6.7 7 .6-5.8 4.9L17.8 21 12 17.3Z" fill="currentColor"/>'
+          : '<path d="M12 17.3 6.2 21l1.6-6.8L2 9.3l7-.6L12 2l3 6.7 7 .6-5.8 4.9L17.8 21 12 17.3Z"/>';
+      }
+      setFav(localStorage.getItem('invite.fav')==='1');
+      btnFav.addEventListener('click', ()=> setFav(localStorage.getItem('invite.fav')!=='1'));
+
+      // More sheet
+      const sheet = document.createElement('div');
+      sheet.className = 'sheet';
+      sheet.innerHTML = '<div class="sheet-content">\
+        <div class="action" id="actPoster">📌 生成海报（PNG）</div>\
+        <div class="action" id="actShare">📤 系统分享</div>\
+        <div class="action" id="actClose">关闭</div>\
+      </div>';
+      document.body.appendChild(sheet);
+      btnMore.addEventListener('click', ()=> sheet.style.display='flex');
+      sheet.addEventListener('click', (e)=>{ if(e.target===sheet) sheet.style.display='none'; });
+      document.getElementById('actClose').addEventListener('click', ()=> sheet.style.display='none');
+      document.getElementById('actPoster').addEventListener('click', ()=>{ sheet.style.display='none'; document.getElementById('makePoster').click(); });
+      document.getElementById('actShare').addEventListener('click', async ()=>{
+        sheet.style.display='none';
+        const start = new Date(params.dateStr + "T" + params.timeStr + ":00");
+        const w = zhWeeks[start.getDay()];
+        const text = `【刘记食府】合肥总店 · 预订邀请\n时间：${params.dateStr}（${w}） ${params.timeStr}\n人数：${params.people}位\n餐位：${params.tableName}\n地址：${params.address}\n电话：${params.phone}`;
+        const url = location.href;
+        if(navigator.share){
+          try{ await navigator.share({ title:"刘记食府 · 预订邀请", text, url }); }catch(e){}
+        }else{ copy(text + "\n" + url); alert("已复制邀请信息，可手动粘贴分享～"); }
+      });
+    })();
+
+    // 系统分享（主按钮）
+    (function shareMain(){
+      const shareBtn = document.getElementById("shareNative");
+      shareBtn.addEventListener("click", async ()=>{
+        const start = new Date(params.dateStr + "T" + params.timeStr + ":00");
+        const w = zhWeeks[start.getDay()];
+        const text = `【刘记食府】合肥总店 · 预订邀请\n时间：${params.dateStr}（${w}） ${params.timeStr}\n人数：${params.people}位\n餐位：${params.tableName}\n地址：${params.address}\n电话：${params.phone}`;
+        const url = location.href;
+        if(navigator.share){ try{ await navigator.share({ title:"刘记食府 · 预订邀请", text, url }); }catch(e){} }
+        else{ copy(text + "\n" + url); alert("已复制邀请信息，可手动粘贴分享～"); }
+      });
+    })();
+
+    // 生成海报（红金风，含二维码）
+    (function poster(){
+      const btn = document.getElementById("makePoster");
+      btn.addEventListener("click", async ()=>{
+        const width = 1080, height = 1440;
+        const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        // 背景
+        const grd = ctx.createLinearGradient(0,0,0,height);
+        grd.addColorStop(0,"#fff3e0"); grd.addColorStop(1,"#ffffff");
+        ctx.fillStyle = grd; ctx.fillRect(0,0,width,height);
+        // 头部红金条
+        ctx.fillStyle="#b91c1c"; ctx.fillRect(0,0,width,180);
+        ctx.fillStyle="#ffd166"; ctx.fillRect(0,180,width,6);
+        // 标题
+        ctx.fillStyle="#ffffff"; ctx.font="700 56px system-ui, PingFang SC"; ctx.textAlign="left";
+        ctx.fillText("刘记食府 · 合肥总店", 64, 120);
+        ctx.fillStyle="#7a2e2e"; ctx.font="600 40px system-ui, PingFang SC"; ctx.fillText("预 订 邀 请", 64, 260);
+        // 信息卡
+        const cardX=60, cardY=300, cardW=960, cardH=680;
+        ctx.fillStyle="#ffffff"; ctx.fillRect(cardX, cardY, cardW, cardH);
+        ctx.strokeStyle="#e8e2d0"; ctx.lineWidth=2; ctx.strokeRect(cardX, cardY, cardW, cardH);
+        ctx.fillStyle="#333"; ctx.textAlign="left";
+        ctx.font="600 40px system-ui, PingFang SC";
+        const start = new Date(params.dateStr + "T" + params.timeStr + ":00");
+        const w = zhWeeks[start.getDay()];
+        const lines = [
+          `时间：${params.dateStr}（${w}） ${params.timeStr}`,
+          `人数：${params.people} 位`,
+          `餐位：${params.tableName}`,
+          `地址：${params.address}`,
+          `电话：${params.phone}`
+        ];
+        let y = cardY + 90; lines.forEach(ln=>{ ctx.fillText(ln, cardX+48, y); y+=80; });
+        // 分隔
+        ctx.strokeStyle="#f1e5bc"; ctx.beginPath(); ctx.moveTo(cardX+40, y+6); ctx.lineTo(cardX+cardW-40, y+6); ctx.stroke();
+        y += 60; ctx.fillStyle="#7a6d63"; ctx.font="400 30px system-ui, PingFang SC";
+        ctx.fillText("人生海海 · 保持热爱 · 同去甄享国宴 · 江湖菜 · 本地土菜", cardX+48, y);
+        // 二维码
+        try{
+          const qr = new SimpleQR({ text: (location && location.href ? location.href : '刘记食府·合肥总店 预订邀请'), size: 480 });
+          qr.make();
+          const dataUrl = qr.createDataURL();
+          const img = new Image();
+          img.onload = ()=>{ ctx.drawImage(img, cardX+cardW-48-260, cardY+80, 240, 240); finalize(); };
+          img.src = dataUrl;
+        }catch(e){ finalize(); }
+        function finalize(){
+          const url = canvas.toDataURL("image/png");
+          const a = document.createElement("a"); a.href=url; a.download="刘记食府-预订邀请-海报.png"; document.body.appendChild(a); a.click(); a.remove();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
